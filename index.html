@@ -215,6 +215,57 @@
                 </ul>
             </details>
         </section>
+
+        <section class="order-status-card" aria-labelledby="order-status-title">
+            <p class="section-label">訂單服務</p>
+            <h2 id="order-status-title">查詢訂單進度</h2>
+            <p>請輸入訂單編號與訂購時填寫的完整手機號碼。</p>
+            <form id="order-lookup-form" class="order-lookup-form">
+                <label>
+                    訂單編號
+                    <input id="lookup-order-number" name="orderNumber" placeholder="例如 BK26-023" autocomplete="off" required>
+                </label>
+                <label>
+                    手機號碼
+                    <input id="lookup-phone" name="phone" type="tel" inputmode="numeric" pattern="09[0-9]{8}" maxlength="10" placeholder="09xxxxxxxx" autocomplete="tel" required>
+                </label>
+                <button id="lookup-button" class="submit-button" type="submit">查詢訂單</button>
+            </form>
+            <p id="lookup-status" class="form-status" role="status"></p>
+
+            <section id="order-result" class="order-result" hidden aria-live="polite">
+                <h3>訂單進度</h3>
+                <dl>
+                    <div><dt>付款狀態</dt><dd id="result-payment-status"></dd></div>
+                    <div><dt>出貨狀態</dt><dd id="result-shipping-status"></dd></div>
+                    <div><dt>預定出貨日期</dt><dd id="result-ship-date"></dd></div>
+                    <div id="tracking-row"><dt>出貨單號</dt><dd id="result-tracking-number"></dd></div>
+                </dl>
+
+                <form id="payment-report-form" class="payment-report-form" hidden>
+                    <h3>追加填寫付款資訊</h3>
+                    <label>
+                        付款方式
+                        <select id="report-payment-method" name="paymentMethod" required>
+                            <option value="">請選擇付款方式</option>
+                            <option value="中華郵政轉帳">中華郵政轉帳</option>
+                            <option value="玉山銀行轉帳">玉山銀行轉帳</option>
+                            <option value="LINE Pay Money">LINE Pay Money</option>
+                        </select>
+                    </label>
+                    <label id="bank-reference-field" hidden>
+                        轉出帳號後五碼
+                        <input id="report-bank-last-five" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" placeholder="請輸入 5 碼">
+                    </label>
+                    <label id="linepay-reference-field" hidden>
+                        LINE Pay 付款人名稱
+                        <input id="report-linepay-name" maxlength="50" placeholder="付款畫面顯示的名稱">
+                    </label>
+                    <button id="payment-report-button" class="submit-button" type="submit">送出付款資訊</button>
+                    <p id="payment-report-status" class="form-status" role="status"></p>
+                </form>
+            </section>
+        </section>
     </main>
 
     <aside class="cart-panel" aria-live="polite">
@@ -313,5 +364,6 @@
     </footer>
 
     <script src="js/main.js?v=8"></script>
+    <script src="js/order-status.js?v=1"></script>
 </body>
 </html>

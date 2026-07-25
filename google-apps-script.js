@@ -20,6 +20,13 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
+  if (e && e.parameter.action === "queryOrder") {
+    return createJsonpResponse(e.parameter.callback, queryOrder(
+      e.parameter.orderNumber,
+      e.parameter.phoneHash
+    ));
+  }
+
   const sheet = getOrderSheet();
 
   return ContentService
@@ -34,6 +41,10 @@ function doGet(e) {
 function doPost(e) {
   const sheet = getOrderSheet();
   const order = JSON.parse(e.postData.contents || "{}");
+
+  if (order.action === "reportPayment") {
+    return createJsonResponse(reportPayment(sheet, order));
+  }
 
   if (order.orderNumber && hasOrderNumber(sheet, order.orderNumber)) {
     return ContentService
@@ -58,7 +69,10 @@ function doPost(e) {
     order.shipping,
     order.total,
     order.paymentMethod,
-    order.paymentReference
+    order.paymentReference,
+    "",
+    "處理中",
+    ""
   ]);
 
   return ContentService
@@ -108,6 +122,10 @@ function getOrderSheet() {
     sheet.getRange(1, 16, 1, 2).setValues([["付款方式", "付款核對資訊"]]);
   }
 
+  if (sheet.getRange(1, 18).getValue() !== "付款回報時間") {
+    sheet.getRange(1, 18, 1, 3).setValues([["付款回報時間", "出貨狀態", "出貨單號"]]);
+  }
+
   return sheet;
 }
 
@@ -139,4 +157,107 @@ function hasOrderNumber(sheet, orderNumber) {
     .findNext();
 
   return Boolean(match);
+}
+
+function queryOrder(orderNumber, phoneHash) {
+  const sheet = getOrderSheet();
+  const row = findVerifiedOrderRow(sheet, orderNumber, phoneHash, true);
+
+  if (!row) {
+    return { ok: true, found: false };
+  }
+
+  const values = sheet.getRange(row, 1, 1, 20).getDisplayValues()[0];
+  return {
+    ok: true,
+    found: true,
+    order: {
+      shipDate: values[7],
+      paymentStatus: values[8] || "尚未付款",
+      shippingStatus: values[18] || "處理中",
+      trackingNumber: values[19] || ""
+    }
+  };
+}
+
+function reportPayment(sheet, report) {
+  const row = findVerifiedOrderRow(
+    sheet,
+    report.orderNumber,
+    normalizePhone(report.customerPhone),
+    false
+  );
+
+  if (!row) {
+    return { ok: false, message: "查無符合訂單" };
+  }
+
+  const method = String(report.paymentMethod || "");
+  const reference = String(report.paymentReference || "");
+  const allowedMethods = ["中華郵政轉帳", "玉山銀行轉帳", "LINE Pay Money"];
+
+  if (allowedMethods.indexOf(method) === -1 || !reference) {
+    return { ok: false, message: "付款資料不完整" };
+  }
+
+  sheet.getRange(row, 9).setValue("已回報待確認");
+  sheet.getRange(row, 16).setValue(method);
+  sheet.getRange(row, 17).setValue(reference);
+  sheet.getRange(row, 18).setValue(new Date());
+  return { ok: true };
+}
+
+function findVerifiedOrderRow(sheet, orderNumber, phoneProof, proofIsHash) {
+  if (sheet.getLastRow() < 2) return 0;
+
+  const normalizedOrderNumber = String(orderNumber || "").trim().toUpperCase();
+  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, 4).getDisplayValues();
+
+  for (let index = 0; index < values.length; index += 1) {
+    const rowOrderNumber = String(values[index][0] || "").trim().toUpperCase();
+    const rowPhone = normalizePhone(values[index][3]);
+    const phoneMatches = proofIsHash
+      ? hashText(rowPhone) === String(phoneProof || "").toLowerCase()
+      : rowPhone === phoneProof;
+
+    if (rowOrderNumber === normalizedOrderNumber && phoneMatches) {
+      return index + 2;
+    }
+  }
+
+  return 0;
+}
+
+function normalizePhone(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function hashText(value) {
+  const bytes = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    value,
+    Utilities.Charset.UTF_8
+  );
+  return bytes.map(function(byte) {
+    const unsignedByte = byte < 0 ? byte + 256 : byte;
+    return ("0" + unsignedByte.toString(16)).slice(-2);
+  }).join("");
+}
+
+function createJsonResponse(payload) {
+  return ContentService
+    .createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function createJsonpResponse(callback, payload) {
+  const safeCallback = String(callback || "").replace(/[^\w.$]/g, "");
+
+  if (!safeCallback) {
+    return createJsonResponse(payload);
+  }
+
+  return ContentService
+    .createTextOutput(`${safeCallback}(${JSON.stringify(payload)});`)
+    .setMimeType(ContentService.MimeType.JAVASCRIPT);
 }
