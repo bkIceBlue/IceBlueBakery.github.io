@@ -939,8 +939,12 @@ fieldset.form-group {
 
 .order-result dl div {
     display: grid;
-    grid-template-columns: 9rem 1fr;
+    grid-template-columns: minmax(7.5rem, 1fr) auto;
+    align-items: center;
     gap: 12px;
+    min-height: 48px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(229, 221, 208, .72);
 }
 
 .order-result dt {
@@ -949,8 +953,55 @@ fieldset.form-group {
 
 .order-result dd {
     margin: 0;
-    color: #294f5a;
     font-weight: 700;
+}
+
+.status-badge {
+    display: inline-flex;
+    justify-content: center;
+    justify-self: end;
+    min-width: max-content;
+    padding: 7px 13px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    line-height: 1.35;
+}
+
+.status-incomplete {
+    color: #9a5a00;
+    background: #fff2d9;
+    border-color: #f2d59f;
+}
+
+.status-pending {
+    color: #765b12;
+    background: #fff8cf;
+    border-color: #e8daa0;
+}
+
+.status-processing,
+.status-info {
+    color: #245f91;
+    background: #e9f4fc;
+    border-color: #c4dff1;
+}
+
+.status-complete {
+    color: #397b2b;
+    background: #edf8e7;
+    border-color: #cce4bf;
+}
+
+.status-neutral {
+    color: #596064;
+    background: #f1f2f2;
+    border-color: #d9dcdd;
+}
+
+.status-cancelled {
+    color: #954b4b;
+    background: #fbeaea;
+    border-color: #edcaca;
 }
 
 .payment-report-form {
@@ -975,8 +1026,12 @@ fieldset.form-group {
     }
 
     .order-result dl div {
-        grid-template-columns: 1fr;
-        gap: 2px;
+        grid-template-columns: minmax(7rem, 1fr) auto;
+        gap: 8px;
+    }
+
+    .status-badge {
+        padding: 6px 11px;
     }
 }
 

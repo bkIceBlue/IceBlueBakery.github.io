@@ -78,7 +78,7 @@ paymentReportForm.addEventListener("submit", async (event) => {
         paymentReportForm.reset();
         updatePaymentFields();
         paymentReportStatus.textContent = "付款資訊已送出，等待店家確認。";
-        document.querySelector("#result-payment-status").textContent = "已回報待確認";
+        setStatusBadge("#result-payment-status", "已回報待確認", "pending");
     } catch (error) {
         console.error(error);
         paymentReportStatus.textContent = "付款資訊未能送出，請稍後再試。";
@@ -88,13 +88,37 @@ paymentReportForm.addEventListener("submit", async (event) => {
 });
 
 function renderOrderResult(order) {
-    document.querySelector("#result-payment-status").textContent = order.paymentStatus || "尚未付款";
-    document.querySelector("#result-shipping-status").textContent = order.shippingStatus || "處理中";
-    document.querySelector("#result-ship-date").textContent = formatDisplayDate(order.shipDate);
-    document.querySelector("#result-tracking-number").textContent = order.trackingNumber || "尚未提供";
+    const paymentStatus = order.paymentStatus || "尚未付款";
+    const shippingStatus = order.shippingStatus || "處理中";
+    const trackingNumber = order.trackingNumber || "尚未提供";
+
+    setStatusBadge("#result-payment-status", paymentStatus, getPaymentStatusTone(paymentStatus));
+    setStatusBadge("#result-shipping-status", shippingStatus, getShippingStatusTone(shippingStatus));
+    setStatusBadge("#result-ship-date", formatDisplayDate(order.shipDate), "info");
+    setStatusBadge("#result-tracking-number", trackingNumber, order.trackingNumber ? "info" : "neutral");
     paymentReportForm.hidden = !["尚未付款", "未選擇", ""].includes(order.paymentStatus || "");
     paymentReportStatus.textContent = "";
     orderResult.hidden = false;
+}
+
+function setStatusBadge(selector, text, tone) {
+    const element = document.querySelector(selector);
+    element.textContent = text;
+    element.className = `status-badge status-${tone}`;
+}
+
+function getPaymentStatusTone(status) {
+    if (["付款已確認", "已付款"].includes(status)) return "complete";
+    if (["已退款", "訂單取消"].includes(status)) return "cancelled";
+    if (status === "已回報待確認") return "pending";
+    return "incomplete";
+}
+
+function getShippingStatusTone(status) {
+    if (status === "已出貨") return "complete";
+    if (["訂單取消", "取消出貨"].includes(status)) return "cancelled";
+    if (["備貨中", "暫緩出貨"].includes(status)) return "pending";
+    return "processing";
 }
 
 function updatePaymentFields() {
