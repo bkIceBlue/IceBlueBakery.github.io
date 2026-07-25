@@ -68,8 +68,10 @@
 
                 <div class="form-group">
                     <label for="ship-date">出貨日期 *</label>
-                    <input id="ship-date" name="shipDate" type="date" min="2026-08-13" max="2026-09-24" required>
-                    <p class="hint">可選日期為 2026/8/13 至 2026/9/24。</p>
+                    <select id="ship-date" name="shipDate" required>
+                        <option value="">請選擇出貨日期</option>
+                    </select>
+                    <p class="hint">可選日期為 2026/8/13 至 2026/9/24；8/27 至 9/1 無法出貨。</p>
                 </div>
 
                 <fieldset class="form-group">

@@ -26,6 +26,12 @@ const bankLastFiveInput = document.querySelector("#bank-last-five");
 const linePayReportFields = document.querySelector("#linepay-report-fields");
 const linePayNameInput = document.querySelector("#linepay-name");
 const submitButton = document.querySelector(".submit-button");
+const shipDateInput = document.querySelector("#ship-date");
+
+const SHIPPING_START_DATE = "2026-08-13";
+const SHIPPING_END_DATE = "2026-09-24";
+const UNAVAILABLE_SHIPPING_START = "2026-08-27";
+const UNAVAILABLE_SHIPPING_END = "2026-09-01";
 
 const money = new Intl.NumberFormat("zh-TW", {
     style: "currency",
@@ -35,6 +41,8 @@ const money = new Intl.NumberFormat("zh-TW", {
 
 let cart = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]");
 let totals = getTotals(cart);
+
+populateShippingDates();
 
 if (window.emailjs) {
     emailjs.init({
@@ -199,6 +207,29 @@ function updatePaidState() {
 
 function getSelectedPickupMethod() {
     return document.querySelector('input[name="pickupMethod"]:checked')?.value || "";
+}
+
+function populateShippingDates() {
+    const start = new Date(`${SHIPPING_START_DATE}T00:00:00`);
+    const end = new Date(`${SHIPPING_END_DATE}T00:00:00`);
+
+    for (const date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+        const value = formatLocalDate(date);
+        const option = document.createElement("option");
+        const isUnavailable = value >= UNAVAILABLE_SHIPPING_START && value <= UNAVAILABLE_SHIPPING_END;
+
+        option.value = value;
+        option.textContent = `${date.getMonth() + 1}/${date.getDate()}${isUnavailable ? "（無法出貨）" : ""}`;
+        option.disabled = isUnavailable;
+        shipDateInput.append(option);
+    }
+}
+
+function formatLocalDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
 }
 
 function getTotals(items, pickupMethod = "") {
