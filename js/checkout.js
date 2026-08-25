@@ -315,7 +315,7 @@ function buildOrder(orderNumber) {
     return {
         orderNumber,
         customerName: data.get("customerName"),
-        customerPhone: data.get("customerPhone"),
+        customerPhone: normalizePhone(data.get("customerPhone")),
         customerAddress: data.get("customerAddress") || "未填寫",
         customerEmail: data.get("customerEmail"),
         pickupMethod,
@@ -328,6 +328,10 @@ function buildOrder(orderNumber) {
         items: cart,
         totals
     };
+}
+
+function normalizePhone(value) {
+    return String(value || "").replace(/\D/g, "");
 }
 
 function buildEmailParams(order) {
