@@ -141,10 +141,11 @@ function renderOrder() {
         cart.forEach((item) => {
             const line = document.createElement("div");
             line.className = "order-line";
-            line.innerHTML = `
-                <strong>${item.name}</strong>
-                <span>${money.format(item.price)} x ${item.quantity} = ${money.format(item.price * item.quantity)}</span>
-            `;
+            const name = document.createElement("strong");
+            const amount = document.createElement("span");
+            name.textContent = item.name;
+            amount.textContent = `${money.format(item.price)} x ${item.quantity} = ${money.format(item.price * item.quantity)}`;
+            line.append(name, amount);
             orderList.append(line);
         });
     }

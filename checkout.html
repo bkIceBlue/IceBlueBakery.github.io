@@ -21,7 +21,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="customer-name">姓名 *</label>
-                        <input id="customer-name" name="customerName" autocomplete="name" required>
+                        <input id="customer-name" name="customerName" maxlength="80" autocomplete="name" required>
                     </div>
 
                     <div class="form-group">
@@ -32,7 +32,7 @@
 
                 <div class="form-group">
                     <label for="customer-email">Email</label>
-                    <input id="customer-email" name="customerEmail" type="email" autocomplete="email">
+                    <input id="customer-email" name="customerEmail" type="email" maxlength="254" autocomplete="email">
                     <p class="hint">訂單回傳確認用，非必填。</p>
                 </div>
 
@@ -57,12 +57,12 @@
                         </label>
                     </div>
                     <p class="hint">選擇宅配才會計算運費。貨運速度是出貨日加 1 至 2 天，物流現在不保證出貨隔日送達，宅配務必算好日期。</p>
-                    <input id="pickup-other" name="pickupOther" placeholder="若選其他，請填寫取貨方式" disabled>
+                    <input id="pickup-other" name="pickupOther" maxlength="90" placeholder="若選其他，請填寫取貨方式" disabled>
                 </fieldset>
 
                 <div class="form-group">
                     <label id="customer-address-label" for="customer-address">地址</label>
-                    <input id="customer-address" name="customerAddress" autocomplete="street-address">
+                    <input id="customer-address" name="customerAddress" maxlength="300" autocomplete="street-address">
                     <p class="hint">選擇宅配時為必填。</p>
                 </div>
 
@@ -90,14 +90,14 @@
                         <input id="bank-last-five" name="bankLastFive" inputmode="numeric" pattern="[0-9]{5}" placeholder="請填轉出帳號後五碼" maxlength="5" disabled>
                     </div>
                     <div id="linepay-report-fields" class="payment-report-fields" hidden>
-                        <input id="linepay-name" name="linePayName" placeholder="LINE Pay 付款人顯示名稱" disabled>
+                        <input id="linepay-name" name="linePayName" maxlength="50" placeholder="LINE Pay 付款人顯示名稱" disabled>
                         <p class="hint">請填付款畫面顯示的名稱，方便核對款項。</p>
                     </div>
                 </fieldset>
 
                 <div class="form-group">
                     <label for="order-note">備註</label>
-                    <textarea id="order-note" name="orderNote" placeholder="不需要紙盒或提袋、取貨提醒或其他需求"></textarea>
+                    <textarea id="order-note" name="orderNote" maxlength="500" placeholder="不需要紙盒或提袋、取貨提醒或其他需求"></textarea>
                 </div>
 
                 <p id="form-status" class="form-status" role="status"></p>
@@ -167,6 +167,6 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script src="js/checkout.js?v=6"></script>
+    <script src="js/checkout.js?v=7"></script>
 </body>
 </html>

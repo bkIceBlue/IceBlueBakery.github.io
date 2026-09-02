@@ -346,17 +346,36 @@ function renderCart() {
     items.forEach((item) => {
         const row = document.createElement("div");
         row.className = "cart-item";
-        row.innerHTML = `
-            <h3>${item.name}</h3>
-            <button class="remove-item" type="button" aria-label="移除 ${item.name}">x</button>
-            <p>${money.format(item.price)} / ${item.unit || "份"}</p>
-            <div class="cart-item-controls" aria-label="${item.name}數量">
-                <button class="decrease-item" type="button" aria-label="減少 ${item.name} 數量">-</button>
-                <span>${item.quantity}</span>
-                <button class="increase-item" type="button" aria-label="增加 ${item.name} 數量">+</button>
-            </div>
-            <strong class="cart-item-total">${money.format(item.price * item.quantity)}</strong>
-        `;
+        const title = document.createElement("h3");
+        const removeButton = document.createElement("button");
+        const price = document.createElement("p");
+        const controls = document.createElement("div");
+        const decreaseButton = document.createElement("button");
+        const quantity = document.createElement("span");
+        const increaseButton = document.createElement("button");
+        const itemTotal = document.createElement("strong");
+
+        title.textContent = item.name;
+        removeButton.className = "remove-item";
+        removeButton.type = "button";
+        removeButton.setAttribute("aria-label", `移除 ${item.name}`);
+        removeButton.textContent = "x";
+        price.textContent = `${money.format(item.price)} / ${item.unit || "份"}`;
+        controls.className = "cart-item-controls";
+        controls.setAttribute("aria-label", `${item.name}數量`);
+        decreaseButton.className = "decrease-item";
+        decreaseButton.type = "button";
+        decreaseButton.setAttribute("aria-label", `減少 ${item.name} 數量`);
+        decreaseButton.textContent = "-";
+        quantity.textContent = item.quantity;
+        increaseButton.className = "increase-item";
+        increaseButton.type = "button";
+        increaseButton.setAttribute("aria-label", `增加 ${item.name} 數量`);
+        increaseButton.textContent = "+";
+        itemTotal.className = "cart-item-total";
+        itemTotal.textContent = money.format(item.price * item.quantity);
+        controls.append(decreaseButton, quantity, increaseButton);
+        row.append(title, removeButton, price, controls, itemTotal);
 
         row.querySelector(".remove-item").addEventListener("click", () => {
             cart.delete(item.name);
